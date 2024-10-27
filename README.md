@@ -16,7 +16,7 @@ This PHP project provides detailed information about YouTube channels using the 
 
 ## Features
 
-- [ ] **Channel Search**: Users can search for any YouTube channel by entering the channel ID or username.
+- [x] **Channel Search**: Users can search for any YouTube channel by entering the channel ID or username.
   
 - [ ] **Real-Time Statistics**: Displays live data on channel statistics such as:
   - [ ] Subscriber count
