@@ -12,10 +12,10 @@ This PHP project provides detailed information about YouTube channels using the 
 
 - [x] **Channel Search**: Users can search for any YouTube channel by entering the channel handle (@).
   
-- [ ] **Real-Time Statistics**: Displays live data on channel statistics such as:
-  - [ ] Subscriber count
-  - [ ] Total views
-  - [ ] Video count
+- [x] **Real-Time Statistics**: Displays live data on channel statistics such as:
+  - [x] Subscriber count
+  - [x] Total views
+  - [x] Video count
   - [ ] Channel creation date
 
 - [ ] **Recent Videos List**: Provides a list of the latest videos uploaded by the channel, including:
