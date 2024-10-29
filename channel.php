@@ -44,7 +44,7 @@ function channelSnippet($channelhandle, $apikey){
     ];
 }
 
-// channel statistics aka getting channel's total views, number of subscriber and number of total videos.
+// channel statistics aka getting channel's total number views, subscribers and videos.
 function channelStatistics($channelhandle, $apikey){
     $url = "https://www.googleapis.com/youtube/v3/channels?part=statistics&forHandle=$channelhandle&key=$apikey";
     $json = getJSONContent($url);
