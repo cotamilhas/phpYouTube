@@ -8,7 +8,7 @@
     <meta name="author" content="cotamilhas">
     <meta property="og:image" content="https://papbyhenrique.pt/yt/img/logo.png" />
     <meta http-equiv="refresh" content="300">
-    <link rel="stylesheet" href="css/searchstyle.css">
+    <link rel="stylesheet" href="css/indexstyle.css">
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <title>YT Project</title>
 </head>
