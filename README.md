@@ -16,7 +16,7 @@ This PHP project provides detailed information about YouTube channels using the 
   - [x] Subscriber count
   - [x] Total views
   - [x] Video count
-  - [ ] Channel creation date
+  - [x] Channel creation date
 
 - [ ] **Recent Videos List**: Provides a list of the latest videos uploaded by the channel, including:
   - [ ] Video titles

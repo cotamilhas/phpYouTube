@@ -19,6 +19,14 @@ function getJSONContent($url) {
     return $json;
 }
 
+// formatting dates, for example: 2016-05-14T15:43:27Z to 2016/05/14 15:43:27
+function formatDate($date){
+    $date = new DateTime($date);
+    $date = $date->format('Y/m/d H:i:s'); // change it according to your region
+
+    return $date;
+}
+
 // channel id
 function getChannelId($channelhandle, $apikey){
     $url = "https://www.googleapis.com/youtube/v3/channels?&forHandle=$channelhandle&key=$apikey";
@@ -34,13 +42,16 @@ function channelSnippet($channelhandle, $apikey){
 
     $channelUsername = $json['items'][0]['snippet']['title'];
     $channelDescription = $json['items'][0]['snippet']['description'];
+    $channelCreationDate = $json['items'][0]['snippet']['publishedAt'];
+    $channelCreationDate = formatDate($channelCreationDate);
     // medium because I think it is enough, change to high or default if you want...
     $channelAvatar = '<img src="' . $json['items'][0]['snippet']['thumbnails']['medium']['url'] . '" alt="Channel Icon">'; 
 
     return [
         'username' => $channelUsername,
         'description' => $channelDescription,
-        'avatar' => $channelAvatar
+        'avatar' => $channelAvatar,
+        'creationDate' => $channelCreationDate
     ];
 }
 
@@ -48,7 +59,6 @@ function channelSnippet($channelhandle, $apikey){
 function channelStatistics($channelhandle, $apikey){
     $url = "https://www.googleapis.com/youtube/v3/channels?part=statistics&forHandle=$channelhandle&key=$apikey";
     $json = getJSONContent($url);
-
     $totalViews = $json['items'][0]['statistics']['viewCount'];
     $hiddenSubCount = $json['items'][0]['statistics']['hiddenSubscriberCount'];
     // this is already impossible to do, hiding youtube subscribers, but if one day youtube come back with this idea...
@@ -70,10 +80,11 @@ echo "ID: " . $channelId;
 echo "<h1>" . $channelSnippet['username'] . "</h1>";
 echo "<p>" . $channelSnippet['description'] . "</p>";
 echo $channelSnippet['avatar'];
+echo "<p>Created in: <u>" . $channelSnippet['creationDate'] . "</u></p>";
 
 // statistics
-echo "<p>Total View: " . $channelStatistics['totalViews'] . "</p>";
-echo "<p>Subscribers: " . $channelStatistics['subscribers'] . "</p>";
-echo "<p> Total Videos: " . $channelStatistics['totalVideos']. "</p>";
+echo "<p>Total View: <u>" . $channelStatistics['totalViews'] . "</u></p>";
+echo "<p>Subscribers: <u>" . $channelStatistics['subscribers'] . "</u></p>";
+echo "<p> Total Videos: <u>" . $channelStatistics['totalVideos']. "</u></p>";
 
 ?>
