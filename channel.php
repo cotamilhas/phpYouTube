@@ -1,25 +1,16 @@
 <?php
-$channelhandle = $_GET['id'];
-$apikey = 'YOUR_API_KEY';
-$channelId = getChannelId($channelhandle, $apikey);
+// to use get json content and look it more professional, function.php is required to use getJSONContent function. I'm probably moving everything here over here to function.php
+require 'function.php';
+$channelId = $_GET['id'];
 
 if ($channelId === "Channel not found.") {
     echo $channelId;
     exit;
 }
 
-$channelSnippet = channelSnippet($channelhandle, $apikey);
-$channelStatistics = channelStatistics($channelhandle, $apikey);
-$channelbrandingSettings = channelbrandingSettings($channelhandle, $apikey);
-
-// getting json
-function getJSONContent($url)
-{
-    $data = file_get_contents($url);
-    $json = json_decode($data, true);
-
-    return $json;
-}
+$channelSnippet = channelSnippet($channelId, $apikey);
+$channelStatistics = channelStatistics($channelId, $apikey);
+$channelbrandingSettings = channelbrandingSettings($channelId, $apikey);
 
 // formatting dates, for example: 2016-05-14T15:43:27Z to 2016/05/14 15:43:27.
 function formatDate($date)
@@ -40,20 +31,10 @@ function textToFlag($countryCode): string
     return mb_convert_encoding('<p>Country: ' . '&#' . implode(';&#', $codePoints) . ';' . '</p>', 'UTF-8', 'HTML-ENTITIES');
 }
 
-
-// channel id
-function getChannelId($channelhandle, $apikey)
-{
-    $url = "https://www.googleapis.com/youtube/v3/channels?&forHandle=$channelhandle&key=$apikey";
-    $json = getJSONContent($url);
-
-    return $json['items'][0]['id'] ?? "Channel not found.";
-}
-
 // channel snippet aka getting channel's avatar, about description and username.
-function channelSnippet($channelhandle, $apikey)
+function channelSnippet($channelId, $apikey)
 {
-    $url = "https://www.googleapis.com/youtube/v3/channels?part=snippet&forHandle=$channelhandle&key=$apikey";
+    $url = "https://www.googleapis.com/youtube/v3/channels?part=snippet&id=$channelId&key=$apikey";
     $json = getJSONContent($url);
 
     $channelUsername = $json['items'][0]['snippet']['title'];
@@ -71,9 +52,9 @@ function channelSnippet($channelhandle, $apikey)
 }
 
 // channel statistics aka getting channel's total number views, subscribers and videos.
-function channelStatistics($channelhandle, $apikey)
+function channelStatistics($channelId, $apikey)
 {
-    $url = "https://www.googleapis.com/youtube/v3/channels?part=statistics&forHandle=$channelhandle&key=$apikey";
+    $url = "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=$channelId&key=$apikey";
     $json = getJSONContent($url);
     $totalViews = $json['items'][0]['statistics']['viewCount'];
     $hiddenSubCount = $json['items'][0]['statistics']['hiddenSubscriberCount'];
@@ -90,9 +71,9 @@ function channelStatistics($channelhandle, $apikey)
 }
 
 // channel branding settings aka getting channel's trailer for people who haven't subscribed yet, country and banner.
-function channelbrandingSettings($channelhandle, $apikey)
+function channelbrandingSettings($channelId, $apikey)
 {
-    $url = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings&forHandle=$channelhandle&key=$apikey";
+    $url = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings&id=$channelId&key=$apikey";
     $json = getJSONContent($url);
     $nonSubscriberTrailerID = $json['items'][0]['brandingSettings']['channel']['unsubscribedTrailer'] ?? null;
     $countryCode = $json['items'][0]['brandingSettings']['channel']['country'] ?? null;
@@ -142,8 +123,6 @@ function channelbrandingSettings($channelhandle, $apikey)
     echo $channelbrandingSettings['channelCountry'];
     echo $channelbrandingSettings['nonSubscriberTrailer'];
     echo $channelbrandingSettings['channelBanner'];
-
-    echo '<hr>';
 
     ?>
 

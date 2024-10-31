@@ -13,4 +13,5 @@ body {
         'Segoe UI Emoji', 'Segoe UI Symbol';
         background-color: #000;
         color: #fff;
+        display: grid;
 }
