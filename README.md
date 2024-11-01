@@ -1,4 +1,4 @@
-# YouTube Channel Info - PHP
+# phpYouTube
 
 This PHP project provides detailed information about YouTube channels using the YouTube API.
 
