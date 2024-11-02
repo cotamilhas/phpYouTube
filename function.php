@@ -1,5 +1,13 @@
 <?php
-$apikey = "YOUR_API_KEY"; 
+// get your API key on Google Cloud Console - YouTube Data API v3
+$apikey = "YOUR_API_KEY";
+
+// change according by your database, since I'm using AMPPS to test this app I use localhost and default username and password.
+// also change $dbname if you want.
+$servername = "localhost";
+$username = "root";
+$password = "mysql";
+$dbname = "phpyoutube";
 
 // getting json content
 function getJSONContent($url)
@@ -11,7 +19,7 @@ function getJSONContent($url)
 // getting channel id
 function getChannelId($channelHandle, $apikey)
 {
-    $channelHandle = str_replace(" ","", $channelHandle);
+    $channelHandle = str_replace(" ", "%20", $channelHandle);
 
     $url = "https://www.googleapis.com/youtube/v3/channels?forHandle=$channelHandle&key=$apikey";
     $json = getJSONContent($url);
@@ -30,7 +38,7 @@ function formatDate($date)
 }
 
 // receives text, the channel country, and turns it into emoji, maybe not the best idea...
-function textToFlag($countryCode): string
+function textToFlagEmoji($countryCode): string
 {
     $codePoints = array_map(function ($char) {
         return 127397 + ord($char);
@@ -89,7 +97,7 @@ function channelbrandingSettings($channelId, $apikey)
     $bannerUrl = $json['items'][0]['brandingSettings']['image']['bannerExternalUrl'] ?? null;
 
     $nonSubscriberTrailer = $nonSubscriberTrailerID ? "<iframe width='420' title='this is a video featured for non-subscribed viewers' height='315' src='https://www.youtube.com/embed/$nonSubscriberTrailerID'></iframe>" : null;
-    $channelCountry = $countryCode ? textToFlag($countryCode) : null;
+    $channelCountry = $countryCode ? textToFlagEmoji($countryCode) : null;
     $channelBanner = $bannerUrl ? "<img src='$bannerUrl' alt='Channel Banner'>" : "<img src='./img/nobanner.png' alt='Channel Banner' title='Unable to get the banner'>";
 
     return [
@@ -100,17 +108,45 @@ function channelbrandingSettings($channelId, $apikey)
 }
 
 // check if channel id exists when is changed in url
-function checkId($channelId, $apikey){
+function checkId($channelId, $apikey)
+{
     $url = "https://www.googleapis.com/youtube/v3/channels?id=$channelId&key=$apikey";
     $json = getJSONContent($url);
 
     $channelId = $json['items'][0]['id'] ?? null;
 
-    if ($channelId == null){
+    if ($channelId == null) {
         header("Location: index.php");
         exit();
     }
 
     return $channelId;
 }
-?>
+
+// ----- database creation -----
+// have to admit that I don't understand what's here, I'm learning how to use PDO with very carefully...
+// no idea how to create tables, maybe changing sql query? HELP :/
+function createDB($servername, $username, $password, $dbname)
+{
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    } catch (PDOException $e) {
+        if ($e->getCode() === 1049) { // error 1049 is unknown database also 42000 but no used by PDO, I think...
+            try {
+                $conn = new PDO("mysql:host=$servername", $username, $password);
+                // configures the PDO to throw exceptions in case of an error
+                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                
+                $query = "CREATE DATABASE $dbname";
+                $conn->exec($query);
+            } catch (PDOException $e) {
+                echo "Error envolving database: " . $e->getMessage();
+            }
+        } else {
+            echo "Connection error: " . $e->getMessage();
+        }
+    } finally {
+        $conn = null; // can I close the connection like this?
+    }
+}
+

@@ -2,6 +2,7 @@
 require 'function.php';
 $channelId = $_GET['id'];
 
+createDB($servername, $username, $password, $dbname);
 $channelId = checkId($channelId, $apikey);
 $channelSnippet = channelSnippet($channelId, $apikey);
 $channelStatistics = channelStatistics($channelId, $apikey);
