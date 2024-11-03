@@ -183,7 +183,7 @@ function createTables($servername, $username, $password, $dbname)
         $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "CREATE TABLE videos (
+        $query = "CREATE TABLE IF NOT EXISTS videos (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     video_id VARCHAR(50) NOT NULL UNIQUE,
                     channel_id INT NOT NULL,
