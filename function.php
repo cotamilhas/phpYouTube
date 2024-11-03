@@ -136,8 +136,8 @@ function createDB($servername, $username, $password, $dbname)
                 $conn = new PDO("mysql:host=$servername", $username, $password);
                 // configures the PDO to throw exceptions in case of an error
                 $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                
-                $query = "CREATE DATABASE $dbname";
+
+                $query = "CREATE DATABASE IF NOT EXISTS $dbname";
                 $conn->exec($query);
             } catch (PDOException $e) {
                 echo "Error envolving database: " . $e->getMessage();
@@ -147,6 +147,59 @@ function createDB($servername, $username, $password, $dbname)
         }
     } finally {
         $conn = null; // can I close the connection like this?
+    }
+}
+
+// here we go again ;-;
+function createTables($servername, $username, $password, $dbname)
+{
+    // table channel
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $query = "CREATE TABLE IF NOT EXISTS channels (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    channel_id VARCHAR(50) NOT NULL UNIQUE,
+                    name VARCHAR(100) NOT NULL,
+                    description TEXT,
+                    created_at DATE,
+                    country VARCHAR(50),
+                    subscriber_count INT,
+                    total_views INT,
+                    video_count INT,
+                    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        );";
+        $conn->exec($query);
+    } catch (PDOException $e) {
+        echo "Error creating channels table: " . $e->getMessage();
+    } finally {
+        $conn = null;
+    }
+
+    // table videos
+    // useless, at the moment... both tables are useless, like this project :D
+    try {
+        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        $query = "CREATE TABLE videos (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    video_id VARCHAR(50) NOT NULL UNIQUE,
+                    channel_id INT NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    description TEXT,
+                    published_at DATETIME,
+                    view_count INT,
+                    like_count INT,
+                    comment_count INT,
+                    FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE
+        );";
+        $conn->exec($query);
+    } catch (PDOException $e) {
+        echo "Error creating videos table: " . $e->getMessage();
+    } finally {
+        $conn = null;
     }
 }
 
