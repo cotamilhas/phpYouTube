@@ -2,13 +2,6 @@
 // get your API key on Google Cloud Console - YouTube Data API v3
 $apikey = "YOUR_API_KEY";
 
-// change according by your database, since I'm using AMPPS to test this app I use localhost and default username and password.
-// also change $dbname if you want.
-$servername = "localhost";
-$username = "root";
-$password = "mysql";
-$dbname = "phpyoutube";
-
 // getting json content
 function getJSONContent($url)
 {
@@ -44,7 +37,7 @@ function textToFlagEmoji($countryCode): string
         return 127397 + ord($char);
     }, str_split(strtoupper($countryCode)));
 
-    return mb_convert_encoding('<p>Country: ' . '&#' . implode(';&#', $codePoints) . ';' . '</p>', 'UTF-8', 'HTML-ENTITIES');
+    return mb_convert_encoding('&#' . implode(';&#', $codePoints) . ';', 'UTF-8', 'HTML-ENTITIES');
 }
 
 // channel snippet aka getting channel's avatar, about description and username.
@@ -94,17 +87,45 @@ function channelbrandingSettings($channelId, $apikey)
     $json = getJSONContent($url);
     $nonSubscriberTrailerID = $json['items'][0]['brandingSettings']['channel']['unsubscribedTrailer'] ?? null;
     $countryCode = $json['items'][0]['brandingSettings']['channel']['country'] ?? null;
-    $bannerUrl = $json['items'][0]['brandingSettings']['image']['bannerExternalUrl'] ?? null;
+    $channelBannerUrl = $json['items'][0]['brandingSettings']['image']['bannerExternalUrl'] . "=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj" ?? null;
 
     $nonSubscriberTrailer = $nonSubscriberTrailerID ? "<iframe width='420' title='this is a video featured for non-subscribed viewers' height='315' src='https://www.youtube.com/embed/$nonSubscriberTrailerID'></iframe>" : null;
     $channelCountry = $countryCode ? textToFlagEmoji($countryCode) : null;
-    $channelBanner = $bannerUrl ? "<img src='$bannerUrl' alt='Channel Banner'>" : "<img src='./img/nobanner.png' alt='Channel Banner' title='Unable to get the banner'>";
+    $channelBanner = $channelBannerUrl ? "<img width='30%' src='$channelBannerUrl' alt='Channel Banner'>" : "<img src='./img/nobanner.png' alt='Channel Banner' title='Unable to get the banner'>";
 
     return [
         'nonSubscriberTrailer' => $nonSubscriberTrailer,
         'channelCountry' => $channelCountry,
-        'channelBanner' => $channelBanner
+        'channelBanner' => $channelBanner,
+        'channelBannerUrl' => $channelBannerUrl
     ];
+}
+
+// get recent videos, more specifically the last 10 videos, it can be changed up to 50 which I think is the maximum
+function getRecentVideos($channelId, $apikey){
+    $maxResult = "10";
+
+    $url = "https://www.googleapis.com/youtube/v3/search?&channelId=$channelId&order=date&part=snippet&type=video&maxResults=$maxResult&key=$apikey";
+    $json = getJSONContent($url);
+
+    $videos = $json['items'] ?? [];
+
+    $videoList = [];
+    foreach ($videos as $video) {
+        $videoId = $video['id']['videoId'] ?? null;
+        $title = $video['snippet']['title'] ?? 'Untitled';
+        $thumbnail = $video['snippet']['thumbnails']['high']['url'] ?? null;
+
+        $videoList[] = [
+            'title' => $title,
+            'videoId' => $videoId,
+            'thumbnail' => $thumbnail,
+            'embedUrl' => $videoId ? "https://www.youtube.com/embed/$videoId" : null
+        ];
+    }
+
+    return $videoList;
+    
 }
 
 // check if channel id exists when is changed in url
@@ -121,85 +142,5 @@ function checkId($channelId, $apikey)
     }
 
     return $channelId;
-}
-
-// ----- database creation -----
-// have to admit that I don't understand what's here, I'm learning how to use PDO with very carefully...
-// no idea how to create tables, maybe changing sql query? HELP :/
-function createDB($servername, $username, $password, $dbname)
-{
-    try {
-        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-    } catch (PDOException $e) {
-        if ($e->getCode() === 1049) { // error 1049 is unknown database also 42000 but no used by PDO, I think...
-            try {
-                $conn = new PDO("mysql:host=$servername", $username, $password);
-                // configures the PDO to throw exceptions in case of an error
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-                $query = "CREATE DATABASE IF NOT EXISTS $dbname";
-                $conn->exec($query);
-            } catch (PDOException $e) {
-                echo "Error envolving database: " . $e->getMessage();
-            }
-        } else {
-            echo "Connection error: " . $e->getMessage();
-        }
-    } finally {
-        $conn = null; // can I close the connection like this?
-    }
-}
-
-// here we go again ;-;
-function createTables($servername, $username, $password, $dbname)
-{
-    // table channel
-    try {
-        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $query = "CREATE TABLE IF NOT EXISTS channels (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    channel_id VARCHAR(50) NOT NULL UNIQUE,
-                    name VARCHAR(100) NOT NULL,
-                    description TEXT,
-                    created_at DATE,
-                    country VARCHAR(50),
-                    subscriber_count INT,
-                    total_views INT,
-                    video_count INT,
-                    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        );";
-        $conn->exec($query);
-    } catch (PDOException $e) {
-        echo "Error creating channels table: " . $e->getMessage();
-    } finally {
-        $conn = null;
-    }
-
-    // table videos
-    // useless, at the moment... both tables are useless, like this project :D
-    try {
-        $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $query = "CREATE TABLE IF NOT EXISTS videos (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    video_id VARCHAR(50) NOT NULL UNIQUE,
-                    channel_id INT NOT NULL,
-                    title VARCHAR(255) NOT NULL,
-                    description TEXT,
-                    published_at DATETIME,
-                    view_count INT,
-                    like_count INT,
-                    comment_count INT,
-                    FOREIGN KEY (channel_id) REFERENCES channels(id) ON DELETE CASCADE
-        );";
-        $conn->exec($query);
-    } catch (PDOException $e) {
-        echo "Error creating videos table: " . $e->getMessage();
-    } finally {
-        $conn = null;
-    }
 }
 

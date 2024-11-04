@@ -1,12 +1,18 @@
 <?php
-require 'function.php';
+require_once 'conn.php';
+require_once 'function.php';
+
 $channelId = $_GET['id'];
 
-createDB($servername, $username, $password, $dbname);
 $channelId = checkId($channelId, $apikey);
 $channelSnippet = channelSnippet($channelId, $apikey);
 $channelStatistics = channelStatistics($channelId, $apikey);
 $channelbrandingSettings = channelbrandingSettings($channelId, $apikey);
+$recentVideos = getRecentVideos($channelId, $apikey);
+
+createDB($config);
+createTables($config);
+addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings);
 
 ?>
 
@@ -17,7 +23,7 @@ $channelbrandingSettings = channelbrandingSettings($channelId, $apikey);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="<?php echo $channelSnippet['username']; ?>" />
-    <meta property="og:description" content="<?php echo "See more about " . $channelSnippet['username']  . " YouTube channel!"; ?>">
+    <meta property="og:description" content="<?php echo "See more about {$channelSnippet['username']} YouTube channel!"; ?>">
     <meta name="author" content="cotamilhas">
     <meta property="og:image" content="<?php echo $avatarUrl; ?>" />
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
@@ -42,9 +48,19 @@ $channelbrandingSettings = channelbrandingSettings($channelId, $apikey);
     echo "<p>Total Videos: <u>" . $channelStatistics['totalVideos'] . "</u></p>";
 
     // brandingSettings
-    echo $channelbrandingSettings['channelCountry'];
+    echo "<p>Country: " . $channelbrandingSettings['channelCountry'] . "</p>";
     echo $channelbrandingSettings['nonSubscriberTrailer'];
     echo $channelbrandingSettings['channelBanner'];
+
+    foreach ($recentVideos as $video) {
+        echo "<h3>Title: " . $video['title'] . "</h3>";
+        if ($video['embedUrl']) {
+            echo "<iframe width='420' height='315' src='{$video['embedUrl']}' title='{$video['title']}'></iframe><br>";
+        }
+        if ($video['thumbnail']) {
+            echo "<img width='30%' src='{$video['thumbnail']}' alt='Thumbnail'><br><br>";
+        }
+    }
 
     ?>
 

@@ -25,7 +25,7 @@
 </html>
 <!-- PHP Code here because 'notfound' element do not want turn red when the php is on top, makes sense why -->
 <?php
-require 'function.php';
+require_once 'function.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $handle = $_POST['id'] ?? ''; 
