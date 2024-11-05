@@ -1,6 +1,7 @@
 <?php
 // change according by your database, since I'm using AMPPS to test this app I use localhost and default username and password.
 // also change $dbname if you want.
+require_once 'function.php';
 
 $config = [
     'servername' => 'localhost',
@@ -9,44 +10,31 @@ $config = [
     'dbname' => 'phpyoutube'
 ];
 
-addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings);
-
-
-require_once 'function.php';
-
+// ----- database related -----
+// database string connection
 function connectDB($config)
 {
     return new PDO("mysql:host={$config['servername']};dbname={$config['dbname']}", $config['username'], $config['password']);
 }
 
-// ----- database creation -----
-// have to admit that I don't understand what's here, I'm learning how to use PDO with very carefully...
-// no idea how to create tables, maybe changing sql query? HELP :/
+// create database
 function createDB($config)
 {
     try {
-        $conn = connectDB($config);
-    } catch (PDOException $e) {
-        if ($e->getCode() === 1049) { // error 1049 is unknown database also 42000 but no used by PDO, I think...
-            try {
-                $conn = connectDB($config);
-                // configures the PDO to throw exceptions in case of an error
-                $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $conn = new PDO("mysql:host={$config['servername']}", $config['username'], $config['password']);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                $query = "CREATE DATABASE IF NOT EXISTS {$config['dbname']}";
-                $conn->exec($query);
-            } catch (PDOException $e) {
-                echo "Error envolving database: " . $e->getMessage();
-            }
-        } else {
-            echo "Connection error: " . $e->getMessage();
-        }
+        // Cria o banco de dados, se ainda não existir
+        $conn->exec("CREATE DATABASE IF NOT EXISTS {$config['dbname']}");
+
+    } catch (PDOException $e) {
+        echo "Error creating database: " . $e->getMessage();
     } finally {
-        $conn = null; // can I close the connection like this?
+        $conn = null; // Fecha a conexão
     }
 }
 
-// here we go again ;-;
+// table creations
 function createTables($config)
 {
 	
@@ -74,8 +62,6 @@ function createTables($config)
         $conn = null;
     }
 
-    // table videos
-    // useless, at the moment... both tables are useless, like this project :D
     try {
         $conn = connectDB($config);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
