@@ -18,10 +18,10 @@ This PHP project provides detailed information about YouTube channels using the 
   - [x] Video count
   - [x] Channel creation date
 
-- [ ] **Recent Videos List**: Provides a list of the latest videos uploaded by the channel, including:
-  - [ ] Video titles
-  - [ ] Publish dates
-  - [ ] Direct links to watch the videos
+- [x] **Recent Videos List**: Provides a list of the latest videos uploaded by the channel, including:
+  - [x] Video titles
+  - [x] Publish dates
+  - [x] Direct links to watch the videos
 
 - [ ] **User-Friendly Interface**: Designed with a clean and intuitive interface, accessible for users of all technical backgrounds.
 

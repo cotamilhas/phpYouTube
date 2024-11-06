@@ -1,7 +1,7 @@
 <?php
 // change according by your database, since I'm using AMPPS to test this app I use localhost and default username and password.
 // also change $dbname if you want.
-require_once 'function.php';
+require_once("function.php");
 
 $config = [
     'servername' => 'localhost',
@@ -23,14 +23,13 @@ function createDB($config)
     try {
         $conn = new PDO("mysql:host={$config['servername']}", $config['username'], $config['password']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        // Cria o banco de dados, se ainda não existir
+        
         $conn->exec("CREATE DATABASE IF NOT EXISTS {$config['dbname']}");
 
     } catch (PDOException $e) {
         echo "Error creating database: " . $e->getMessage();
     } finally {
-        $conn = null; // Fecha a conexão
+        $conn = null;
     }
 }
 
@@ -86,25 +85,33 @@ function createTables($config)
     }
 }
 
-// adding channel content like subscribers, views, etc...
-// there's A LOT to change here since I asked ChatGPT how I can add stuff, I understand what's happening here but I feel like it's wrong
-// I'm going to leave this aside for a while and code the video part
 function addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings){
-	try {
+    try {
         $conn = connectDB($config);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        $query = "INSERT INTO channels (channel_id, name, description, created_at, country, subscriber_count, total_views, video_count) 
-                        VALUES (:channel_id, :name, :description, :created_at, :country, :subscriber_count, :total_views, :video_count)
-                        ON DUPLICATE KEY UPDATE 
-                            name = :name, 
-                            description = :description, 
-                            created_at = :created_at, 
-                            country = :country, 
-                            subscriber_count = :subscriber_count, 
-                            total_views = :total_views, 
-                            video_count = :video_count,
-                            last_updated = CURRENT_TIMESTAMP";
+        // check if channel id is already there maybe not the best idea 
+        $checkQuery = "SELECT COUNT(*) FROM channels WHERE channel_id = :channel_id";
+        $stmtCheck = $conn->prepare($checkQuery);
+        $stmtCheck->bindParam(':channel_id', $channelId);
+        $stmtCheck->execute();
+        $updateId = $stmtCheck->fetchColumn() > 0;
+
+        if ($updateId) {
+            $query = "UPDATE channels 
+                      SET name = :name, 
+                          description = :description, 
+                          created_at = :created_at, 
+                          country = :country, 
+                          subscriber_count = :subscriber_count, 
+                          total_views = :total_views, 
+                          video_count = :video_count,
+                          last_updated = CURRENT_TIMESTAMP 
+                      WHERE channel_id = :channel_id";
+        } else {
+            $query = "INSERT INTO channels (channel_id, name, description, created_at, country, subscriber_count, total_views, video_count) 
+                      VALUES (:channel_id, :name, :description, :created_at, :country, :subscriber_count, :total_views, :video_count)";
+        }
 
         $stmt = $conn->prepare($query);
 
@@ -119,10 +126,12 @@ function addChannelContent($config, $channelId, $channelSnippet, $channelStatist
 
         $stmt->execute();
     } catch (PDOException $e) {
-        echo "Error inserting data into channels table: " . $e->getMessage();
+        echo "Error inserting/updating data into channels table: " . $e->getMessage();
     } finally {
         $conn = null;
     }
 }
+
+
 
 

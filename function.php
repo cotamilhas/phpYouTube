@@ -3,15 +3,13 @@
 $apikey = "YOUR_API_KEY";
 
 // getting json content
-function getJSONContent($url)
-{
+function getJSONContent($url) {
     $data = file_get_contents($url);
     return json_decode($data, true);
 }
 
 // getting channel id
-function getChannelId($channelHandle, $apikey)
-{
+function getChannelId($channelHandle, $apikey) {
     $channelHandle = str_replace(" ", "%20", $channelHandle);
 
     $url = "https://www.googleapis.com/youtube/v3/channels?forHandle=$channelHandle&key=$apikey";
@@ -22,8 +20,7 @@ function getChannelId($channelHandle, $apikey)
 }
 
 // formatting dates, for example: 2016-05-14T15:43:27Z to 2016/05/14 15:43:27.
-function formatDate($date)
-{
+function formatDate($date) {
     $date = new DateTime($date);
     $date = $date->format('Y/m/d H:i:s'); // change it according to your region
 
@@ -31,8 +28,7 @@ function formatDate($date)
 }
 
 // receives text, the channel country, and turns it into emoji, maybe not the best idea...
-function textToFlagEmoji($countryCode): string
-{
+function textToFlagEmoji($countryCode): string {
     $codePoints = array_map(function ($char) {
         return 127397 + ord($char);
     }, str_split(strtoupper($countryCode)));
@@ -41,29 +37,25 @@ function textToFlagEmoji($countryCode): string
 }
 
 // channel snippet aka getting channel's avatar, about description and username.
-function channelSnippet($channelId, $apikey)
-{
+function channelSnippet($channelId, $apikey) {
     $url = "https://www.googleapis.com/youtube/v3/channels?part=snippet&id=$channelId&key=$apikey";
     $json = getJSONContent($url);
 
     $channelUsername = $json['items'][0]['snippet']['title'];
     $channelDescription = $json['items'][0]['snippet']['description'] ?? null;
     $channelCreationDate = formatDate($json['items'][0]['snippet']['publishedAt']);
-    $channelAvatarUrl = $json['items'][0]['snippet']['thumbnails']['medium']['url'] ?? "./img/noavatar.png";
-    $channelAvatar = $channelAvatarUrl ? "<img src='$channelAvatarUrl' alt='Channel Avatar'>" : "<img src='./img/noavatar.png' alt='Channel Avatar' title='Unable to get the avatar'>";
+    $channelAvatarUrl = $json['items'][0]['snippet']['thumbnails']['medium']['url'] ?? null;
 
     return [
         'username' => $channelUsername,
         'description' => $channelDescription,
-        'avatar' => $channelAvatar,
-        'avatarUrl' => $channelAvatarUrl,
+        'avatarUrl' => $channelAvatarUrl ?? "./img/noavatar.png",
         'creationDate' => $channelCreationDate
     ];
 }
 
 // channel statistics aka getting channel's total number views, subscribers and videos.
-function channelStatistics($channelId, $apikey)
-{
+function channelStatistics($channelId, $apikey) {
     $url = "https://www.googleapis.com/youtube/v3/channels?part=statistics&id=$channelId&key=$apikey";
     $json = getJSONContent($url);
     $totalViews = $json['items'][0]['statistics']['viewCount'];
@@ -81,56 +73,54 @@ function channelStatistics($channelId, $apikey)
 }
 
 // channel branding settings aka getting channel's trailer for people who haven't subscribed yet, country and banner.
-function channelbrandingSettings($channelId, $apikey)
-{
+function channelbrandingSettings($channelId, $apikey) {
     $url = "https://www.googleapis.com/youtube/v3/channels?part=brandingSettings&id=$channelId&key=$apikey";
     $json = getJSONContent($url);
-    $nonSubscriberTrailerID = $json['items'][0]['brandingSettings']['channel']['unsubscribedTrailer'] ?? null;
-    $countryCode = $json['items'][0]['brandingSettings']['channel']['country'] ?? null;
-    $channelBannerUrl = $json['items'][0]['brandingSettings']['image']['bannerExternalUrl'] . "=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj" ?? null;
-
-    $nonSubscriberTrailer = $nonSubscriberTrailerID ? "<iframe width='420' title='this is a video featured for non-subscribed viewers' height='315' src='https://www.youtube.com/embed/$nonSubscriberTrailerID'></iframe>" : null;
+    
+    $brandingSettings = $json['items'][0]['brandingSettings']['channel'] ?? null;
+    $nonSubscriberTrailerID = $brandingSettings['unsubscribedTrailer'] ?? null;
+    $countryCode = $brandingSettings['country'] ?? null;
+    $bannerUrl = isset($json['items'][0]['brandingSettings']['image']['bannerExternalUrl']) 
+        ? $json['items'][0]['brandingSettings']['image']['bannerExternalUrl'] . "=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj" 
+        : null;
+    $nonSubscriberTrailer = $nonSubscriberTrailerID ? "https://www.youtube.com/embed/$nonSubscriberTrailerID" : null;
     $channelCountry = $countryCode ? textToFlagEmoji($countryCode) : null;
-    $channelBanner = $channelBannerUrl ? "<img width='30%' src='$channelBannerUrl' alt='Channel Banner'>" : "<img src='./img/nobanner.png' alt='Channel Banner' title='Unable to get the banner'>";
 
     return [
         'nonSubscriberTrailer' => $nonSubscriberTrailer,
         'channelCountry' => $channelCountry,
-        'channelBanner' => $channelBanner,
-        'channelBannerUrl' => $channelBannerUrl
+        'bannerUrl' => $bannerUrl ?? "./img/nobanner.png"
     ];
 }
 
-// get recent videos, more specifically the last 10 videos, it can be changed up to 50 which I think is the maximum
-function getRecentVideos($channelId, $apikey){
-    $maxResult = "10";
 
-    $url = "https://www.googleapis.com/youtube/v3/search?&channelId=$channelId&order=date&part=snippet&type=video&maxResults=$maxResult&key=$apikey";
+// get recent videos, more specifically the last 10 videos, it can be changed up to 50 which I think is the maximum
+function getRecentVideos($channelId, $apikey) {
+    $url = "https://www.googleapis.com/youtube/v3/search?channelId=$channelId&order=date&part=snippet&type=video&maxResults=10&key=$apikey";
     $json = getJSONContent($url);
 
-    $videos = $json['items'] ?? [];
-
     $videoList = [];
-    foreach ($videos as $video) {
-        $videoId = $video['id']['videoId'] ?? null;
-        $title = $video['snippet']['title'] ?? 'Untitled';
-        $thumbnail = $video['snippet']['thumbnails']['high']['url'] ?? null;
+    foreach ($json['items'] ?? [] as $item) {
+        $videoId = $item['id']['videoId'] ?? null;
+        $title = $item['snippet']['title'] ?? 'Untitled';
+        $publishDate = $item['snippet']['publishedAt'] ?? 'Unknown';
+        $publishDate = formatDate($publishDate);
+        $thumbnail = $item['snippet']['thumbnails']['high']['url'] ?? null;
 
         $videoList[] = [
             'title' => $title,
             'videoId' => $videoId,
-            'thumbnail' => $thumbnail,
-            'embedUrl' => $videoId ? "https://www.youtube.com/embed/$videoId" : null
+            'publishDate' => $publishDate,
+            'thumbnail' => $thumbnail
         ];
     }
 
     return $videoList;
-    
 }
 
+
 // check if channel id exists when is changed in url
-function checkId($channelId, $apikey)
-{
+function checkId($channelId, $apikey) {
     $url = "https://www.googleapis.com/youtube/v3/channels?id=$channelId&key=$apikey";
     $json = getJSONContent($url);
 
@@ -143,4 +133,3 @@ function checkId($channelId, $apikey)
 
     return $channelId;
 }
-
