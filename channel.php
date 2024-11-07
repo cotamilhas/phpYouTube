@@ -2,20 +2,19 @@
 require_once("conn.php");
 require_once("function.php");
 
+// get channel id
 $channelId = $_GET['id'];
 
-$channelId = checkId($channelId, $apikey);
-$channelSnippet = channelSnippet($channelId, $apikey);
-$channelStatistics = channelStatistics($channelId, $apikey);
-$channelbrandingSettings = channelbrandingSettings($channelId, $apikey);
-$recentVideos = getRecentVideos($channelId, $apikey);
+$channelId = checkId($channelId, $apikey); // check channel id
+$channelSnippet = channelSnippet($channelId, $apikey); // get channel snippet aka getting channel's avatar, about description and username
+$channelStatistics = channelStatistics($channelId, $apikey); // channel statistics aka getting channel's total number views, subscribers and videos
+$channelbrandingSettings = channelbrandingSettings($channelId, $apikey); // channel branding settings aka getting channel's trailer for people who haven't subscribed yet, country and banner
+$recentVideos = getRecentVideos($channelId, $apikey); // get recent videos
 
-createDB($config);
-createTables($config);
-addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings);
-
+createDB($config); // create database
+createTables($config); // create tables
+addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings); // adds content to the database
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,40 +29,69 @@ addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $cha
     <link rel="stylesheet" href="./css/channelstyle.css">
     <title>phpYouTube</title>
 </head>
+<?php
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $handle = $_POST['id'] ?? '';
 
+    $channelId = getChannelId($handle, $apikey);
+
+    if ($channelId) {
+        header("Location: channel.php?id=" . urlencode($channelId));
+        exit();
+    } else {
+        echo "<p id='notfound'>CHANNEL NOT FOUND</p>";
+    }
+}
+?>
 <body>
-    <?
-    // channel id
-    echo "ID: $channelId";
-
-    // snippet
-    echo "<h1>{$channelSnippet['username']}</h1>";
-    echo "<p>{$channelSnippet['description']}</p>";
-    echo "<img src=\"{$channelSnippet['avatarUrl']}\" alt=\"Channel Avatar\">";
-    echo "<p>Created in: <u>{$channelSnippet['creationDate']}</u></p>";
-
-    // statistics
-    echo "<p>Total View: <u>{$channelStatistics['totalViews']}</u></p>";
-    echo "<p>Subscribers: <u>{$channelStatistics['subscribers']}</u></p>";
-    echo "<p>Total Videos: <u>{$channelStatistics['totalVideos']}</u></p>";
-
-    // brandingSettings
-    echo "<p>Country: {$channelbrandingSettings['channelCountry']}</p>";
-    echo "<img width=\"30%\" src=\"{$channelbrandingSettings['bannerUrl']}\" alt=\"Channel Banner\">";
-    if ($channelbrandingSettings['nonSubscriberTrailer']) {
-        echo "<iframe width=\"560\" height=\"315\" src=\"{$channelbrandingSettings['nonSubscriberTrailer']}\" allowfullscreen></iframe>";
-    }
-
-    // video list
-    foreach ($recentVideos as $video) {
-        echo "<h3>Title: {$video['title']}</h3>";
-        echo "<p>Posted on: {$video['publishDate']}</p>";
-        echo "<a href=\"https://www.youtube.com/watch?v={$video['videoId']}\">";
-        echo "<img src=\"{$video['thumbnail']}\" alt=\"Thumbnail\"></a><br><br>";
-    }
-
-    ?>
-
+    <div class="container">
+        <!-- search bar -->
+        <h1 class="logo">phpYouTube</h1>
+        <form method="POST">
+            <div id="search-box">
+                <div id="handlebox">@</div>
+                <input id="ch" type="text" autocomplete="off" spellcheck="false" name="id" placeholder="Ex: yomilhas" required>
+                <button type="submit">Search</button>
+            </div>
+        </form>
+        <!-- banner -->
+        <img class="banner" src="<?php echo $channelbrandingSettings['bannerUrl']; ?>" alt="Channel Banner">
+        <!-- profile header which contains channal avatar, username and description -->
+        <div class="profile-header">
+            <img src="<?php echo $channelSnippet['avatarUrl']; ?>" alt="Channel Avatar">
+            <h1><?php echo $channelSnippet['username']; ?></h1>
+            <p><?php echo $channelSnippet['description']; ?></p>
+        </div>
+        <!-- profile info which contains creation date and channel country -->
+        <div class="profile-info">
+            <p><strong>ID:</strong> <?php echo $channelId; ?></p>
+            <p><strong>Created in:</strong> <u><?php echo $channelSnippet['creationDate']; ?></u></p>
+            <p><strong>Country:</strong> <?php echo $channelbrandingSettings['channelCountry']; ?></p>
+        </div>
+        <!-- channel stats which contains total views, subscribers and total videos -->
+        <div class="stats">
+            <p><strong>Total Views:</strong> <?php echo $channelStatistics['totalViews']; ?></p>
+            <p><strong>Subscribers:</strong> <?php echo $channelStatistics['subscribers']; ?></p>
+            <p><strong>Total Videos:</strong> <?php echo $channelStatistics['totalVideos']; ?></p>
+        </div>
+        <!-- video section which contains recent videos -->
+        <div class="video-section">
+            <?php foreach ($recentVideos as $video): ?>
+                <h3>Recent Videos</h3>
+                <div class="video-card">
+                    <h3>Title: <?php echo $video['title']; ?></h3>
+                    <p>Posted on: <?php echo $video['publishDate']; ?></p>
+                    <a href="https://www.youtube.com/watch?v=<?php echo $video['videoId']; ?>">
+                        <img src="<?php echo $video['thumbnail']; ?>" alt="Thumbnail">
+                    </a>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <!-- non subscriber trailer -->
+        <?php if ($channelbrandingSettings['nonSubscriberTrailer']): ?>
+            <iframe width="560" height="315" src="<?php echo $channelbrandingSettings['nonSubscriberTrailer']; ?>" allowfullscreen></iframe>
+        <?php endif; ?>
+    </div>
 </body>
 
 </html>

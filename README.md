@@ -5,8 +5,8 @@ This PHP project provides detailed information about YouTube channels using the 
 ## Technologies
 
 - **PHP 8.2.25**
-- **MySQL**: Stores channel information and statistics.
-- **YouTube API**
+- **MySQL**
+- **YouTube Data V3 API**
 
 ## Features
 

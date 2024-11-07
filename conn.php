@@ -23,9 +23,8 @@ function createDB($config)
     try {
         $conn = new PDO("mysql:host={$config['servername']}", $config['username'], $config['password']);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        $conn->exec("CREATE DATABASE IF NOT EXISTS {$config['dbname']}");
 
+        $conn->exec("CREATE DATABASE IF NOT EXISTS {$config['dbname']}");
     } catch (PDOException $e) {
         echo "Error creating database: " . $e->getMessage();
     } finally {
@@ -36,7 +35,7 @@ function createDB($config)
 // table creations
 function createTables($config)
 {
-	
+
     // table channel
     try {
         $conn = connectDB($config);
@@ -85,7 +84,8 @@ function createTables($config)
     }
 }
 
-function addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings){
+function addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings)
+{
     try {
         $conn = connectDB($config);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -131,7 +131,3 @@ function addChannelContent($config, $channelId, $channelSnippet, $channelStatist
         $conn = null;
     }
 }
-
-
-
-
