@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: channel.php?id=" . urlencode($channelId));
         exit();
     } else {
-        echo "<p id='notfound'>CHANNEL NOT FOUND</p>";
+        echo "<h2 id='notfound'>CHANNEL NOT FOUND</h2>";
     }
 }
 ?>

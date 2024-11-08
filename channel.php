@@ -39,18 +39,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         header("Location: channel.php?id=" . urlencode($channelId));
         exit();
     } else {
-        echo "<p id='notfound'>CHANNEL NOT FOUND</p>";
+        echo "<h2 id='notfound'>CHANNEL NOT FOUND</h2>";
     }
 }
 ?>
 <body>
     <div class="container">
         <!-- search bar -->
-        <h1 class="logo">phpYouTube</h1>
+        <h1 class="logo"><a href="index.php">phpYouTube</a></h1>
         <form method="POST">
             <div id="search-box">
                 <div id="handlebox">@</div>
-                <input id="ch" type="text" autocomplete="off" spellcheck="false" name="id" placeholder="Ex: yomilhas" required>
+                <input id="ch" type="text" autocomplete="off" spellcheck="false" name="id" placeholder="Search" required>
                 <button type="submit">Search</button>
             </div>
         </form>
@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
         <!-- non subscriber trailer -->
         <?php if ($channelbrandingSettings['nonSubscriberTrailer']): ?>
-            <iframe width="560" height="315" src="<?php echo $channelbrandingSettings['nonSubscriberTrailer']; ?>" allowfullscreen></iframe>
+            <iframe src="<?php echo $channelbrandingSettings['nonSubscriberTrailer']; ?>" allowfullscreen></iframe>
         <?php endif; ?>
     </div>
 </body>
