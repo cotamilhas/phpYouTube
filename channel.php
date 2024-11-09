@@ -25,7 +25,7 @@ addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $cha
     <meta property="og:description" content="<?php echo "See more about {$channelSnippet['username']} YouTube channel!"; ?>">
     <meta name="author" content="cotamilhas">
     <meta property="og:image" content="<?php echo $avatarUrl; ?>" />
-    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <link rel="icon" type="image/png" href="<?php echo $avatarUrl; ?>" />
     <link rel="stylesheet" href="./css/channelstyle.css">
     <title>phpYouTube</title>
 </head>
