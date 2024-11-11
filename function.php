@@ -46,18 +46,20 @@ function channelSnippet($channelId, $apikey)
     $url = "https://www.googleapis.com/youtube/v3/channels?part=snippet&id=$channelId&key=$apikey";
     $json = getJSONContent($url);
 
-    $channelUsername = $json['items'][0]['snippet']['title'];
-    $channelDescription = isset($json['items'][0]['snippet']['description'])
+    $username = $json['items'][0]['snippet']['title'];
+    $description = isset($json['items'][0]['snippet']['description'])
         ? nl2br($json['items'][0]['snippet']['description'])
         : null;
-    $channelCreationDate = formatDate($json['items'][0]['snippet']['publishedAt']);
-    $channelAvatarUrl = $json['items'][0]['snippet']['thumbnails']['medium']['url'] ?? null;
+    $creationDate = formatDate($json['items'][0]['snippet']['publishedAt']);
+    $avatarUrl = $json['items'][0]['snippet']['thumbnails']['medium']['url'] ?? "./img/noavatar.png";
+
+    getChannelPictures($channelId, $avatarUrl, $pictureName = "avatar.png");
 
     return [
-        'username' => $channelUsername,
-        'description' => $channelDescription,
-        'avatarUrl' => $channelAvatarUrl ?? "./img/noavatar.png",
-        'creationDate' => $channelCreationDate
+        'username' => $username,
+        'description' => $description,
+        'avatarUrl' => $avatarUrl,
+        'creationDate' => $creationDate
     ];
 }
 
@@ -91,14 +93,16 @@ function channelbrandingSettings($channelId, $apikey)
     $countryCode = $brandingSettings['country'] ?? null;
     $bannerUrl = isset($json['items'][0]['brandingSettings']['image']['bannerExternalUrl'])
         ? $json['items'][0]['brandingSettings']['image']['bannerExternalUrl'] . "=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj"
-        : null;
+        : "./img/nobanner.png";
     $nonSubscriberTrailer = $nonSubscriberTrailerID ? "https://www.youtube.com/embed/$nonSubscriberTrailerID" : null;
     $channelCountry = $countryCode ? textToFlagEmoji($countryCode) : null;
+
+    getChannelPictures($channelId, $bannerUrl, $pictureName = "banner.png");
 
     return [
         'nonSubscriberTrailer' => $nonSubscriberTrailer,
         'channelCountry' => $channelCountry,
-        'bannerUrl' => $bannerUrl ?? "./img/nobanner.png"
+        'bannerUrl' => $bannerUrl
     ];
 }
 
@@ -126,6 +130,21 @@ function getRecentVideos($channelId, $apikey)
     }
 
     return $videoList;
+}
+
+// tries to download the channel avatar and banner to avoid error 403
+function getChannelPictures($channelId, $url, $pictureName)
+{
+    $channelPath = "channel/" . $channelId;
+
+    if (!is_dir($channelPath)) {
+        mkdir($channelPath, 0777, true);
+    }
+
+    $fullPath = $channelPath . '/' . $pictureName;
+
+    $image = file_get_contents($url);
+    file_put_contents($fullPath, $image);
 }
 
 

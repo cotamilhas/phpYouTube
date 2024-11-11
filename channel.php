@@ -14,6 +14,7 @@ $recentVideos = getRecentVideos($channelId, $apikey); // get recent videos
 createDB($config); // create database
 createTables($config); // create tables
 addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings); // adds content to the database
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,8 +25,8 @@ addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $cha
     <meta property="og:title" content="<?php echo $channelSnippet['username']; ?>" />
     <meta property="og:description" content="<?php echo "See more about {$channelSnippet['username']} YouTube channel!"; ?>">
     <meta name="author" content="cotamilhas">
-    <meta property="og:image" content="<?php echo $avatarUrl; ?>" />
-    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <meta property="og:image" content="./channel/<?php echo $channelId?>/avatar.png" />
+    <link rel="icon" type="image/png" href="./channel/<?php echo $channelId?>/avatar.png"/>
     <link rel="stylesheet" href="./css/channelstyle.css">
     <title>phpYouTube</title>
 </head>
@@ -55,10 +56,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </form>
         <!-- banner -->
-        <img class="banner" src="<?php echo $channelbrandingSettings['bannerUrl']; ?>" alt="Channel Banner">
+        <img class="banner" src="./channel/<?php echo $channelId?>/banner.png" alt="Channel Banner">
         <!-- profile header which contains channal avatar, username and description -->
         <div class="profile-header">
-            <img src="<?php echo $channelSnippet['avatarUrl']; ?>" alt="Channel Avatar">
+            <img src="./channel/<?php echo $channelId?>/avatar.png" alt="Channel Avatar">
             <h1><?php echo $channelSnippet['username']; ?></h1>
             <p><?php echo $channelSnippet['description']; ?></p>
         </div>
