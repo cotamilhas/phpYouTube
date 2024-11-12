@@ -26,7 +26,7 @@ addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $cha
     <meta property="og:description" content="<?php echo "See more about {$channelSnippet['username']} YouTube channel!"; ?>">
     <meta name="author" content="cotamilhas">
     <meta property="og:image" content="<?php echo $channelSnippet['avatarUrl']; ?>" />
-    <link rel="icon" type="image/png" href="./channel/<?php echo $channelId; ?>/avatar.png"/>
+    <link rel="icon" type="image/png" href="./channel/<?php echo $channelId; ?>/avatar.png" />
     <link rel="stylesheet" href="./css/channelstyle.css">
     <title>phpYouTube</title>
 </head>
@@ -44,6 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 ?>
+
 <body>
     <div class="container">
         <!-- search bar -->
@@ -56,10 +57,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </form>
         <!-- banner -->
-        <img class="banner" src="./channel/<?php echo $channelId?>/banner.png" alt="Channel Banner">
+        <img class="banner" src="./channel/<?php echo $channelId ?>/banner.png" alt="Channel Banner">
         <!-- profile header which contains channal avatar, username and description -->
         <div class="profile-header">
-            <img src="./channel/<?php echo $channelId?>/avatar.png" alt="Channel Avatar">
+            <img src="./channel/<?php echo $channelId ?>/avatar.png" alt="Channel Avatar">
             <h1><?php echo $channelSnippet['username']; ?></h1>
             <p><?php echo $channelSnippet['description']; ?></p>
         </div>
@@ -76,18 +77,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <p><strong>Total Videos:</strong> <?php echo $channelStatistics['totalVideos']; ?></p>
         </div>
         <!-- video section which contains recent videos -->
-        <div class="video-section">
-            <?php foreach ($recentVideos as $video): ?>
+        <?php if ($channelStatistics['totalVideos'] > 0): ?>
+            <div class="video-section">
                 <h3>Recent Videos</h3>
-                <div class="video-card">
-                    <h3>Title: <?php echo $video['title']; ?></h3>
-                    <p>Posted on: <?php echo $video['publishDate']; ?></p>
-                    <a href="https://www.youtube.com/watch?v=<?php echo $video['videoId']; ?>">
-                        <img src="<?php echo $video['thumbnail']; ?>" alt="Thumbnail">
-                    </a>
-                </div>
-            <?php endforeach; ?>
-        </div>
+                <?php foreach ($recentVideos as $video): ?>
+                    <div class="video-card">
+                        <h3><?php echo $video['title']; ?></h3>
+                        <p>Posted on: <?php echo $video['publishDate']; ?></p>
+                        <a href="https://www.youtube.com/watch?v=<?php echo $video['videoId']; ?>">
+                            <img src="<?php echo $video['thumbnail']; ?>" alt="Thumbnail">
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
         <!-- non subscriber trailer -->
         <?php if ($channelbrandingSettings['nonSubscriberTrailer']): ?>
             <iframe src="<?php echo $channelbrandingSettings['nonSubscriberTrailer']; ?>" allowfullscreen></iframe>

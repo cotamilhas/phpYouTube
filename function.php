@@ -53,7 +53,7 @@ function channelSnippet($channelId, $apikey)
     $creationDate = formatDate($json['items'][0]['snippet']['publishedAt']);
     $avatarUrl = $json['items'][0]['snippet']['thumbnails']['medium']['url'] ?? "./img/noavatar.png";
 
-    getChannelPictures($channelId, $avatarUrl, $pictureName = "avatar.png");
+    getChannelPictures($channelId, $avatarUrl, $pictureName = "avatar.png"); // Avatar Download
 
     return [
         'username' => $username,
@@ -97,7 +97,7 @@ function channelbrandingSettings($channelId, $apikey)
     $nonSubscriberTrailer = $nonSubscriberTrailerID ? "https://www.youtube.com/embed/$nonSubscriberTrailerID" : null;
     $channelCountry = $countryCode ? textToFlagEmoji($countryCode) : null;
 
-    getChannelPictures($channelId, $bannerUrl, $pictureName = "banner.png");
+    getChannelPictures($channelId, $bannerUrl, $pictureName = "banner.png"); // Banner Download
 
     return [
         'nonSubscriberTrailer' => $nonSubscriberTrailer,
