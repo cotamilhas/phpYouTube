@@ -57,10 +57,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </div>
         </form>
         <!-- banner -->
-        <img class="banner" src="./channel/<?php echo $channelId ?>/banner.png" alt="Channel Banner">
+        <img class="banner" src="<?php echo $channelbrandingSettings['bannerUrl'] ?>" alt="Channel Banner">
         <!-- profile header which contains channal avatar, username and description -->
         <div class="profile-header">
-            <img src="./channel/<?php echo $channelId ?>/avatar.png" alt="Channel Avatar">
+            <img src="<?php echo $channelSnippet['avatarUrl'] ?>" alt="Channel Avatar">
             <h1><?php echo $channelSnippet['username']; ?></h1>
             <p><?php echo $channelSnippet['description']; ?></p>
         </div>
@@ -68,7 +68,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="profile-info">
             <p><strong>ID:</strong> <?php echo $channelId; ?></p>
             <p><strong>Created in:</strong> <u><?php echo $channelSnippet['creationDate']; ?></u></p>
-            <p><strong>Country:</strong> <?php echo $channelbrandingSettings['channelCountry']; ?></p>
+            <?php if ($channelbrandingSettings['countryFlag']): ?>
+                <p><strong>Country:</strong> <?php echo $channelbrandingSettings['countryFlag']; ?></p>
+            <?php endif; ?>    
         </div>
         <!-- channel stats which contains total views, subscribers and total videos -->
         <div class="stats">
