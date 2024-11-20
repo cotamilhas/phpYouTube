@@ -51,9 +51,9 @@ function channelSnippet($channelId, $apikey)
         ? nl2br($json['items'][0]['snippet']['description'])
         : null;
     $creationDate = formatDate($json['items'][0]['snippet']['publishedAt']);
-    $avatarUrl = $json['items'][0]['snippet']['thumbnails']['medium']['url'] ?? "./img/noavatar.png";
+    $avatarUrl = $json['items'][0]['snippet']['thumbnails']['high']['url'] ?? "./img/noavatar.png";
 
-    getChannelPictures($channelId, $avatarUrl, $pictureName = "avatar.png"); // Avatar Download
+    $avatarUrl = getChannelPictures($channelId, $avatarUrl, $pictureName = "avatar.png"); // Avatar Download
 
     return [
         'username' => $username,
@@ -95,17 +95,16 @@ function channelbrandingSettings($channelId, $apikey)
         ? $json['items'][0]['brandingSettings']['image']['bannerExternalUrl'] . "=w2120-fcrop64=1,00000000ffffffff-k-c0xffffffff-no-nd-rj"
         : "./img/nobanner.png";
     $nonSubscriberTrailer = $nonSubscriberTrailerID ? "https://www.youtube.com/embed/$nonSubscriberTrailerID" : null;
-    $channelCountry = $countryCode ? textToFlagEmoji($countryCode) : null;
+    $countryFlag = $countryCode ? textToFlagEmoji($countryCode) : null;
 
-    getChannelPictures($channelId, $bannerUrl, $pictureName = "banner.png"); // Banner Download
+    $bannerUrl = getChannelPictures($channelId, $bannerUrl, $pictureName = "banner.png"); // Banner Download
 
     return [
         'nonSubscriberTrailer' => $nonSubscriberTrailer,
-        'channelCountry' => $channelCountry,
+        'countryFlag' => $countryFlag,
         'bannerUrl' => $bannerUrl
     ];
 }
-
 
 // get recent videos, more specifically the last 10 videos, it can be changed up to 50 which I think is the maximum
 function getRecentVideos($channelId, $apikey)
@@ -132,21 +131,55 @@ function getRecentVideos($channelId, $apikey)
     return $videoList;
 }
 
+
+// get video snippet
+function videoSnippet($videoId, $apikey)
+{
+    $url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=$videoId&key=$apikey";
+    $json = getJSONContent($url);
+
+    $creationDate = formatDate($json['items'][0]['snippet']['publishedAt']);
+    $channelId = $json['items'][0]['snippet']['channelId'];
+    $title = $json['items'][0]['snippet']['title'];
+    $description = $json['items'][0]['snippet']['description'];
+    $tags = isset($json['items'][0]['snippet']['tags']) ? $json['items'][0]['snippet']['tags'] : [];
+    $thumbnail = $item['snippet']['thumbnails']['high']['url'] ?? './img/nothumbnail.png';
+
+    return [
+        'creationDate' => $creationDate,
+        'channelId' => $channelId,
+        'title' => $title,
+        'description' => $description,
+        'tags' => $tags,
+        'thumbnail' => $thumbnail
+    ];
+}
+
 // tries to download the channel avatar and banner to avoid error 403
 function getChannelPictures($channelId, $url, $pictureName)
 {
-    $channelPath = "channel/" . $channelId;
+    $defaultPictures = [
+        "banner.png" => "./img/nobanner.png",
+        "avatar.png" => "./img/noavatar.png"
+    ];
 
-    if (!is_dir($channelPath)) {
+    if (isset($defaultPictures[$pictureName]) && $url === $defaultPictures[$pictureName])
+        $url = null;
+
+    $channelPath = "channel/$channelId";
+    if (!is_dir($channelPath))
         mkdir($channelPath, 0777, true);
+
+    $fullPath = "$channelPath/$pictureName";
+
+    if ($url) {
+        $image = file_get_contents($url);
+        file_put_contents($fullPath, $image);
+        return "./channel/$channelId/$pictureName";
     }
 
-    $fullPath = $channelPath . '/' . $pictureName;
-
-    $image = file_get_contents($url);
-    file_put_contents($fullPath, $image);
+    return $defaultPictures[$pictureName];
 }
-
 
 // check if channel id exists when is changed in url
 function checkId($channelId, $apikey)

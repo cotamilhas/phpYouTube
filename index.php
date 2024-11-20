@@ -7,18 +7,19 @@
     <meta property="og:description" content="See YouTube channels info">
     <meta name="author" content="cotamilhas">
     <meta property="og:image" content="./img/logo.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/indexstyle.css">
     <link rel="icon" type="image/x-icon" href="img/favicon.ico">
     <title>phpYoutube</title>
 </head>
 <body>
     <form method="POST">
-        <div id="logo">phpYouTube</div>
-        <div id="search-box">
-            <div id="handlebox">@</div>
-            <input id="ch" type="text" autocomplete="off" spellcheck="false" name="id" placeholder="Ex: yomilhas" required>
-            <button type="submit">Search</button>
+        <div id="logo"><h2>phpYouTube</h2></div>
+        <div class="search-container">
+            <div class="search-bar">
+                <span class="search-icon">@</span>
+                <input type="text" name="id" placeholder="Ex: yomilhas" class="search-input" autocomplete="off" spellcheck="false" required>
+                <button type="submit" class="search-button">Search</button>
+            </div>
         </div>
     </form>
 </body>
@@ -28,7 +29,7 @@
 require_once 'function.php';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $handle = $_POST['id'] ?? ''; 
+    $handle = $_POST['id'] ?? '';
 
     $channelId = getChannelId($handle, $apikey);
 

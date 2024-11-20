@@ -60,6 +60,7 @@ function createTables($config)
         $conn = null;
     }
 
+    // table videos
     try {
         $conn = connectDB($config);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

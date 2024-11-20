@@ -32,7 +32,7 @@ addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $cha
 </head>
 <?php
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $handle = $_POST['id'] ?? '';
+    $handle = $_POST['id'] ?? null;
 
     $channelId = getChannelId($handle, $apikey);
 
@@ -50,17 +50,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <!-- search bar -->
         <h1 class="logo"><a href="index.php">phpYouTube</a></h1>
         <form method="POST">
-            <div id="search-box">
-                <div id="handlebox">@</div>
-                <input id="ch" type="text" autocomplete="off" spellcheck="false" name="id" placeholder="Search" required>
-                <button type="submit">Search</button>
+            <div class="search-container">
+                <div class="search-bar">
+                    <span class="search-icon">@</span>
+                    <input type="text" name="id" placeholder="Ex: yomilhas" class="search-input" autocomplete="off" spellcheck="false" required>
+                    <button class="search-button">Search</button>
+                </div>
             </div>
         </form>
         <!-- banner -->
-        <img class="banner" src="./channel/<?php echo $channelId ?>/banner.png" alt="Channel Banner">
+        <img class="banner" src="<?php echo $channelbrandingSettings['bannerUrl'] ?>" alt="Channel Banner">
         <!-- profile header which contains channal avatar, username and description -->
         <div class="profile-header">
-            <img src="./channel/<?php echo $channelId ?>/avatar.png" alt="Channel Avatar">
+            <img src="<?php echo $channelSnippet['avatarUrl'] ?>" alt="Channel Avatar">
             <h1><?php echo $channelSnippet['username']; ?></h1>
             <p><?php echo $channelSnippet['description']; ?></p>
         </div>
@@ -68,7 +70,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="profile-info">
             <p><strong>ID:</strong> <?php echo $channelId; ?></p>
             <p><strong>Created in:</strong> <u><?php echo $channelSnippet['creationDate']; ?></u></p>
-            <p><strong>Country:</strong> <?php echo $channelbrandingSettings['channelCountry']; ?></p>
+            <?php if ($channelbrandingSettings['countryFlag']): ?>
+                <p><strong>Country:</strong> <?php echo $channelbrandingSettings['countryFlag']; ?></p>
+            <?php endif; ?>
         </div>
         <!-- channel stats which contains total views, subscribers and total videos -->
         <div class="stats">
@@ -84,7 +88,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="video-card">
                         <h3><?php echo $video['title']; ?></h3>
                         <p>Posted on: <?php echo $video['publishDate']; ?></p>
-                        <a href="https://www.youtube.com/watch?v=<?php echo $video['videoId']; ?>">
+                        <a href="video.php?id=<?php echo $video['videoId']; ?>">
                             <img src="<?php echo $video['thumbnail']; ?>" alt="Thumbnail">
                         </a>
                     </div>
