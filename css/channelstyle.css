@@ -35,8 +35,12 @@ body {
 }
 
 #notfound {
-    color: #F00;
-    margin-top: 15px;
+    color: red;
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.5s ease-in-out;
 }
 
 form {
@@ -68,7 +72,6 @@ form {
     background-color: #333;
     border-radius: 8px;
     overflow: hidden;
-    /* Evita bordas quebradas */
     width: 400px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
@@ -238,6 +241,16 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @media (max-width: 768px) {

@@ -5,7 +5,10 @@ $apikey = "YOUR_API_KEY";
 // getting json content
 function getJSONContent($url)
 {
-    $data = file_get_contents($url);
+    $data = @file_get_contents($url, false);
+    if ($data === false) {
+        return null;
+    }
     return json_decode($data, true);
 }
 
@@ -196,3 +199,20 @@ function checkId($channelId, $apikey)
 
     return $channelId;
 }
+
+// check if video id exists when is changed in url
+function checkVideoId($videoId, $apikey)
+{
+    $url = "https://www.googleapis.com/youtube/v3/videos?id=$videoId&key=$apikey";
+    $json = getJSONContent($url);
+
+    $videoId = $json['items'][0]['id'] ?? null;
+
+    if ($videoId == null) {
+        header("Location: index.php");
+        exit();
+    }
+
+    return $videoId;
+}
+

@@ -1,4 +1,3 @@
-/* Estilos gerais */
 body {
     font-family: Arial, sans-serif;
     background-color: #1c1c1c;
@@ -6,16 +5,19 @@ body {
     margin: 0;
     padding: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    text-align: center;
 }
 
 #logo {
-    font-size: 24px;
+    font-size: 36px;
     font-weight: bold;
     margin-bottom: 20px;
-    text-align: center;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .search-container {
@@ -78,23 +80,33 @@ body {
 
 #notfound {
     color: red;
-    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
     margin-top: 20px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 @media (max-width: 600px) {
     body {
-        flex-direction: column;
         padding: 10px;
     }
 
-    .search-bar {
-        width: 100%; 
-        max-width: 100%;
+    #logo {
+        font-size: 28px;
     }
 
-    #logo {
-        font-size: 20px;
+    .search-bar {
+        width: 100%;
+        max-width: 100%;
     }
 
     .search-icon {
@@ -110,5 +122,9 @@ body {
     .search-button {
         font-size: 14px;
         padding: 0 15px;
+    }
+
+    #notfound {
+        font-size: 16px;
     }
 }

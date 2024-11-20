@@ -3,6 +3,7 @@ require_once("conn.php");
 require_once("function.php");
 
 $videoId = $_GET['id'];
+$videoId = checkVideoId($videoId, $apikey);
 
 $videoSnippet = videoSnippet($videoId, $apikey);
 ?>

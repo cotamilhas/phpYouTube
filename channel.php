@@ -31,6 +31,8 @@ addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $cha
     <title>phpYouTube</title>
 </head>
 <?php
+require_once 'function.php';
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $handle = $_POST['id'] ?? null;
 
@@ -39,9 +41,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($channelId) {
         header("Location: channel.php?id=" . urlencode($channelId));
         exit();
-    } else {
-        echo "<h2 id='notfound'>CHANNEL NOT FOUND</h2>";
-    }
+    } else
+        $notFound = true;
 }
 ?>
 
@@ -58,6 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             </div>
         </form>
+        <?php if (!empty($notFound)): ?>
+            <h2 id="notfound">CHANNEL NOT FOUND</h2>
+        <?php endif; ?>
         <!-- banner -->
         <img class="banner" src="<?php echo $channelbrandingSettings['bannerUrl'] ?>" alt="Channel Banner">
         <!-- profile header which contains channal avatar, username and description -->
