@@ -70,7 +70,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <div class="profile-info">
             <p><strong>ID:</strong> <?php echo $channelId; ?></p>
             <p><strong>Created in:</strong> <u><?php echo $channelSnippet['creationDate']; ?></u></p>
-            <p><strong>Country:</strong> <?php echo $channelbrandingSettings['channelCountry']; ?></p>
+            <?php if ($channelbrandingSettings['countryFlag']): ?>
+                <p><strong>Country:</strong> <?php echo $channelbrandingSettings['countryFlag']; ?></p>
+            <?php endif; ?>
         </div>
         <!-- channel stats which contains total views, subscribers and total videos -->
         <div class="stats">
