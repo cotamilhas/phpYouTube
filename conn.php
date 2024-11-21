@@ -120,7 +120,7 @@ function addChannelContent($config, $channelId, $channelSnippet, $channelStatist
         $stmt->bindParam(':name', $channelSnippet['username']);
         $stmt->bindParam(':description', $channelSnippet['description']);
         $stmt->bindParam(':created_at', $channelSnippet['creationDate']);
-        $stmt->bindParam(':country', $channelbrandingSettings['channelCountry']);
+        $stmt->bindParam(':country', $channelbrandingSettings['countryFlag']);
         $stmt->bindParam(':subscriber_count', $channelStatistics['subscribers']);
         $stmt->bindParam(':total_views', $channelStatistics['totalViews']);
         $stmt->bindParam(':video_count', $channelStatistics['totalVideos']);
