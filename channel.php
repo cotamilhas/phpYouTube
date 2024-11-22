@@ -2,6 +2,8 @@
 require_once("conn.php");
 require_once("function.php");
 
+$domainUrl = "localhost/"; // change this to your domain, so it can show the meta image, localhost do not work.
+
 // get channel id
 $channelId = $_GET['id'];
 
@@ -25,7 +27,7 @@ addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $cha
     <meta property="og:title" content="<?php echo $channelSnippet['username']; ?>" />
     <meta property="og:description" content="<?php echo "See more about {$channelSnippet['username']} YouTube channel!"; ?>">
     <meta name="author" content="cotamilhas">
-    <meta property="og:image" content="<?php echo $channelSnippet['avatarUrl']; ?>" />
+    <meta property="og:image" content="<?php echo $domainUrl . $channelSnippet['avatarUrl']; ?>" />
     <link rel="icon" type="image/png" href="./channel/<?php echo $channelId; ?>/avatar.png" />
     <link rel="stylesheet" href="./css/channelstyle.css">
     <title>phpYouTube</title>
@@ -63,10 +65,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <h2 id="notfound">CHANNEL NOT FOUND</h2>
         <?php endif; ?>
         <!-- banner -->
-        <img class="banner" src="<?php echo $channelbrandingSettings['bannerUrl'] ?>" alt="Channel Banner">
+        <img class="banner" src=".<?php echo $channelbrandingSettings['bannerUrl'] ?>" alt="Channel Banner">
         <!-- profile header which contains channal avatar, username and description -->
         <div class="profile-header">
-            <img src="<?php echo $channelSnippet['avatarUrl'] ?>" alt="Channel Avatar">
+            <img src=".<?php echo $channelSnippet['avatarUrl'] ?>" alt="Channel Avatar">
             <h1><?php echo $channelSnippet['username']; ?></h1>
             <p><?php echo $channelSnippet['description']; ?></p>
         </div>
@@ -105,5 +107,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <?php endif; ?>
     </div>
 </body>
-
+<?php echo $domainUrl . $channelSnippet['avatarUrl']; ?>
 </html>
