@@ -178,7 +178,7 @@ function getChannelPictures($channelId, $url, $pictureName)
     if ($url) {
         $image = file_get_contents($url);
         file_put_contents($fullPath, $image);
-        return "/channel/$channelId/$pictureName";
+        return "./channel/$channelId/$pictureName";
     }
 
     return $defaultPictures[$pictureName];

@@ -2,7 +2,8 @@
 require_once("conn.php");
 require_once("function.php");
 
-$domainUrl = "localhost/"; // change this to your domain, so it can show the meta image, localhost do not work.
+// change this to your domain, so it can show the meta image, localhost do not work.
+$domainUrl = rtrim(($_SERVER['HTTPS'] ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]", '/');
 
 // get channel id
 $channelId = $_GET['id'];
@@ -16,6 +17,8 @@ $recentVideos = getRecentVideos($channelId, $apikey); // get recent videos
 createDB($config); // create database
 createTables($config); // create tables
 addChannelContent($config, $channelId, $channelSnippet, $channelStatistics, $channelbrandingSettings); // adds content to the database
+
+
 
 ?>
 <!DOCTYPE html>
@@ -61,14 +64,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             </div>
         </form>
-        <?php if (!empty($notFound)): ?>
+        <?php if ($notFound): ?>
             <h2 id="notfound">CHANNEL NOT FOUND</h2>
         <?php endif; ?>
         <!-- banner -->
-        <img class="banner" src=".<?php echo $channelbrandingSettings['bannerUrl'] ?>" alt="Channel Banner">
+        <img class="banner" src="<?php echo $channelbrandingSettings['bannerUrl'] ?>" alt="Channel Banner">
         <!-- profile header which contains channal avatar, username and description -->
         <div class="profile-header">
-            <img src=".<?php echo $channelSnippet['avatarUrl'] ?>" alt="Channel Avatar">
+            <img src="<?php echo $channelSnippet['avatarUrl'] ?>" alt="Channel Avatar">
             <h1><?php echo $channelSnippet['username']; ?></h1>
             <p><?php echo $channelSnippet['description']; ?></p>
         </div>
@@ -107,5 +110,4 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <?php endif; ?>
     </div>
 </body>
-<?php echo $domainUrl . $channelSnippet['avatarUrl']; ?>
 </html>
