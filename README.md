@@ -29,8 +29,6 @@ This PHP project provides detailed information about YouTube channels using the 
 
 - [ ] **Data Visualization**: Incorporates graphical representations of channel growth and engagement metrics.
 
-- [ ] **Bookmark Favorite Channels**: Users can save their favorite channels for quick access.
-
 - [ ] **Multi-Language Support**: Offers the option to view information in multiple languages.
 
 
